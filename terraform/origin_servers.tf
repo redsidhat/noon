@@ -7,6 +7,7 @@ resource "aws_instance" "origin" {
     security_groups = ["allow_ssh", "allow_https", "allow_http"]
     key_name = "${aws_key_pair.server-key.key_name}"
     count = "${var.origin-count}"
+    iam_instance_profile = "${aws_iam_instance_profile.s3_instance_profile.id}"
     tags {
         Name = "origin-${count.index}"
     }
