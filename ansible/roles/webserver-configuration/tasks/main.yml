@@ -1,0 +1,44 @@
+- name: Install nginx if not installed
+  apt:
+    name: "nginx"
+    update_cache: yes
+    cache_valid_time: 36000
+    state: installed
+
+- name: Copy nginx conf to server
+  copy:
+    src: "{{ role_path }}/files/{{ nginx_conf_name }}"
+    dest: "/etc/nginx/sites-available/{{ nginx_conf_name }}"
+    owner: root
+    group: root
+    mode: 0644
+- name: making sure nginx default site is removed
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: 
+    - restart nginx
+- name: basic auth
+  copy:
+    src: "{{ role_path }}/files/{{ auth_file }}"
+    dest: "/etc/nginx/{{ auth_file }}"
+  notify: 
+    - restart nginx
+  when: auth_file is defined
+- name: place uwsgi param file
+  copy:
+    src: "{{ role_path }}/files/{{ uwsgi_param_file }}"
+    dest: "/etc/nginx/{{ uwsgi_param_file }}"
+  notify: 
+    - restart nginx
+  when: uwsgi_param_file is defined
+- name: Activating site
+  file:
+    src: "/etc/nginx/sites-available/{{ nginx_conf_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ nginx_conf_name }}"
+    state: link    
+  notify: 
+    # - start sensu
+    - restart nginx
+- name: Ensuring nginx is started
+  shell: /etc/init.d/nginx start

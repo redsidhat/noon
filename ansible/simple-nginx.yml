@@ -1,0 +1,15 @@
+- hosts: simple-host
+  become: yes
+  become_user: root
+  gather_facts: no
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+      
+- name: simple webserver
+  hosts: simple-host
+  become: yes
+  vars:
+    nginx_conf_name: simple.conf
+  roles:
+    - webserver-configuration
