@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import boto3
-import json
+
 region_name = 'ap-south-1'
 ec2client = boto3.client('ec2', region_name = region_name)
 response = ec2client.describe_instances()
